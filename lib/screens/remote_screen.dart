@@ -26,13 +26,13 @@ class RemoteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
-        elevation: 4,
         color: const Color(0xFFDEE7E8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(30),
+          side: const BorderSide(color: Color(0xFF243E51), width: 10),
         ),
         child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

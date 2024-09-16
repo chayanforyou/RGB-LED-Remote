@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
       ),
       home: const ColoredBox(
-        color: Color(0xFF181818),
+        color: Color(0xFF16202A),
         child: RemoteScreen(),
       ),
     );
