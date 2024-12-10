@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:rgbremote/screens/remote_screen.dart';
 import 'package:rgbremote/screens/settings_screen.dart';
 import 'package:rgbremote/services/preferences_service.dart';
@@ -6,7 +9,8 @@ import 'package:rgbremote/utils/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  PreferencesService.initialize();
+  unawaited(MobileAds.instance.initialize());
+  unawaited(PreferencesService.initialize());
   runApp(const MyApp());
 }
 
