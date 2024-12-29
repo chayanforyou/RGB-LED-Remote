@@ -10,7 +10,7 @@ class PreferencesService {
 
   static SharedPreferences? _prefs;
 
-  static void initialize() async {
+  static Future<void> initialize() async {
     _prefs ??= await SharedPreferences.getInstance();
     await _loadPreference();
   }
