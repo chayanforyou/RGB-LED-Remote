@@ -52,4 +52,14 @@ class IrSensorPlugin {
   static Future<void> vibrate() async {
     return await _channel.invokeMethod('vibrate');
   }
+
+  static Future<Map<String, int>> rawSoundList() async {
+    final rawSoundList = await _channel.invokeMethod('rawSoundList');
+    return (rawSoundList as Map<Object?, Object?>).cast<String, int>();
+  }
+
+  /// This method is for playing sound
+  static Future<void> playSound({required String? soundName}) async {
+    return await _channel.invokeMethod('playSound', {"soundName": soundName} );
+  }
 }

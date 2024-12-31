@@ -2,6 +2,8 @@ package io.github.chayanforyou.rgbremote
 
 import android.content.Context
 import android.hardware.ConsumerIrManager
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -15,14 +17,35 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler {
 
     private lateinit var channel: MethodChannel
-    private lateinit var vibrator: Vibrator
     private var irManager: ConsumerIrManager? = null
     private var frequency = 38028 // 38KHz
+
+    private lateinit var attributes: AudioAttributes
+    private lateinit var vibrator: Vibrator
+    private lateinit var soundPool: SoundPool
+
+    private val soundMap = mutableMapOf<String, Int>()
+
+    private fun loadAllSounds() {
+        val fields= R.raw::class.java.fields
+        fields.forEach {field ->
+            val name = field.name
+            val resourceId = field.getInt(field)
+
+            val soundId = soundPool.load(context, resourceId, 1)
+            soundMap[name] = soundId
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "ir_sensor_plugin")
         channel.setMethodCallHandler(this)
+
+        attributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
 
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager =
@@ -33,7 +56,14 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler {
             getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
 
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(1)
+            .setAudioAttributes(attributes)
+            .build()
+
         irManager = getSystemService(Context.CONSUMER_IR_SERVICE) as? ConsumerIrManager
+
+        loadAllSounds()
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -44,6 +74,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler {
             "transmitListInt" -> transmitList(call, result)
             "getCarrierFrequencies" -> getCarrierFrequencies(result)
             "vibrate" -> vibrate(result)
+            "rawSoundList" -> rawSoundList(result)
+            "playSound" -> playSound(call, result)
             else -> result.notImplemented()
         }
     }
@@ -156,15 +188,41 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler {
     /**
      * Make a soft vibration effect
      */
-    @Suppress("deprecation")
     private fun vibrate(result: MethodChannel.Result) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val vibrationEffect =
-                VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
-            vibrator.vibrate(vibrationEffect)
+            val vibrationEffect = VibrationEffect.createOneShot(50L, VibrationEffect.DEFAULT_AMPLITUDE)
+            vibrator.vibrate(vibrationEffect, attributes)
         } else {
-            vibrator.vibrate(50)
+            vibrator.vibrate(50L)
         }
+        result.success(null)
+    }
+
+    /**
+     * Return the list of files in raw folder
+     */
+    private fun rawSoundList(result: MethodChannel.Result) {
+        if (soundMap.isEmpty()) {
+            result.error("1", "No sounds are available", null)
+            return
+        }
+
+        result.success(soundMap)
+    }
+
+    /**
+     * Play a tap sound
+     */
+    private fun playSound(call: MethodCall, result: MethodChannel.Result) {
+        if (soundMap.isEmpty()) {
+            result.error("1", "No sounds available for playing", null)
+            return
+        }
+
+        val soundName = call.argument<String>("soundName")
+
+        val soundId = soundMap[soundName] ?: soundMap.values.first()
+        soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
         result.success(null)
     }
 
