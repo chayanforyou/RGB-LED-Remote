@@ -214,15 +214,12 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler {
      * Play a tap sound
      */
     private fun playSound(call: MethodCall, result: MethodChannel.Result) {
-        if (soundMap.isEmpty()) {
-            result.error("1", "No sounds available for playing", null)
-            return
+        if (soundMap.isNotEmpty()) {
+            val soundName = call.argument<String>("soundName")
+            val soundId = soundMap[soundName] ?: soundMap.values.first()
+            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
         }
 
-        val soundName = call.argument<String>("soundName")
-
-        val soundId = soundMap[soundName] ?: soundMap.values.first()
-        soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
         result.success(null)
     }
 

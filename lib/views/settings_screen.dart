@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rgbremote/extensions/string_extensions.dart';
 import 'package:rgbremote/plugin/ir_sensor_plugin.dart';
 import 'package:rgbremote/services/settings_service.dart';
@@ -114,11 +115,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     _settings = settingsNotifier.value;
-    final rawSoundList = await IrSensorPlugin.rawSoundList();
-    setState(() => _rawSoundList = rawSoundList);
 
-    if (_settings.soundFileName == null && _rawSoundList.isNotEmpty) {
-      _setSoundFile(_rawSoundList.keys.first);
+    try {
+      final rawSoundList = await IrSensorPlugin.rawSoundList();
+      setState(() => _rawSoundList = rawSoundList);
+
+      if (_settings.soundFileName == null && _rawSoundList.isNotEmpty) {
+        _setSoundFile(_rawSoundList.keys.first);
+      }
+    } on PlatformException catch (e) {
+      debugPrint(e.message);
     }
   }
 
