@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:rgbremote/ads/facebook_ad_manager.dart';
 import 'package:rgbremote/config/app_color.dart';
 import 'package:rgbremote/config/app_text.dart';
+import 'package:rgbremote/ads/google_ad_manager.dart';
 import 'package:rgbremote/utils/consent_manager.dart';
 import 'package:rgbremote/views/settings_screen.dart';
-import 'package:rgbremote/widgets/banner_ad_widget.dart';
+import 'package:rgbremote/ads/widgets/banner_ad_widget.dart';
 import 'package:rgbremote/widgets/remote_button.dart';
 import 'package:rgbremote/widgets/ir_light_effect.dart';
 
@@ -21,9 +22,7 @@ class RemoteScreen extends StatefulWidget {
 }
 
 class _RemoteScreenState extends State<RemoteScreen> with SingleTickerProviderStateMixin {
-  InterstitialAd? _interstitialAd;
   final ConsentManager _consentManager = ConsentManager();
-  final String _adUnitId = 'ca-app-pub-3224119074707344/4058225198';
 
   late AnimationController _animationController;
   late Animation<double> _opacityAnimation;
@@ -57,17 +56,17 @@ class _RemoteScreenState extends State<RemoteScreen> with SingleTickerProviderSt
         debugPrint("${consentGatheringError.errorCode}: ${consentGatheringError.message}");
       }
 
-      _loadAppExitAd();
+      GoogleAdManager().loadInterstitialAd(onAdLoadError: () {
+        // In case of failed to load google ads, load facebook ads instead
+        FacebookAdManager().loadInterstitialAd();
+      });
     });
-
-    _loadAppExitAd();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     _subscription.cancel();
-    _interstitialAd?.dispose();
     super.dispose();
   }
 
@@ -78,7 +77,10 @@ class _RemoteScreenState extends State<RemoteScreen> with SingleTickerProviderSt
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        final shouldPop = await _showAppExitAds();
+        bool isGoogleAdLoaded = GoogleAdManager().isAdLoaded();
+        final shouldPop = isGoogleAdLoaded
+            ? await GoogleAdManager().showInterstitialAd()
+            : await FacebookAdManager().showInterstitialAd();
         if (mounted && shouldPop == true) {
           SystemNavigator.pop();
         }
@@ -192,50 +194,5 @@ class _RemoteScreenState extends State<RemoteScreen> with SingleTickerProviderSt
         bottomNavigationBar: BannerAdWidget(),
       ),
     );
-  }
-
-  /// Loads an interstitial ad.
-  void _loadAppExitAd() async {
-    var canRequestAds = await _consentManager.canRequestAds();
-    if (!canRequestAds) {
-      return;
-    }
-
-    InterstitialAd.load(
-      adUnitId: _adUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          _interstitialAd = null;
-        },
-      ),
-    );
-  }
-
-  /// Show interstitial ad.
-  Future<bool> _showAppExitAds() {
-    final completer = Completer<bool>();
-
-    if (_interstitialAd != null) {
-      _interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (Ad ad) {
-          ad.dispose();
-          completer.complete(true);
-        },
-        onAdFailedToShowFullScreenContent: (Ad ad, AdError err) {
-          ad.dispose();
-          completer.complete(true);
-        },
-      );
-
-      _interstitialAd?.show();
-    } else {
-      completer.complete(true);
-    }
-
-    return completer.future;
   }
 }

@@ -38,10 +38,11 @@ dependencies:
   flutter_font_icons: ^2.2.7
   material_neumorphic: ^1.2.1
   flutter_dropdown_alert: ^1.0.7
-  shared_preferences: ^2.3.4
-  package_info_plus: ^8.1.2
+  shared_preferences: ^2.5.2
+  package_info_plus: ^8.3.0
   url_launcher: ^6.3.1
-  google_mobile_ads: ^5.2.0
+  google_mobile_ads: ^5.3.1
+  easy_audience_network: ^0.0.7
 
 dev_dependencies:
   flutter_test:
