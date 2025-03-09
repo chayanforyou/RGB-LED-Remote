@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:rgbremote/ads/facebook_ad_manager.dart';
+import 'package:rgbremote/ads/applovin_ad_manager.dart';
 import 'package:rgbremote/config/app_color.dart';
 import 'package:rgbremote/config/app_text.dart';
 import 'package:rgbremote/ads/google_ad_manager.dart';
@@ -57,8 +57,9 @@ class _RemoteScreenState extends State<RemoteScreen> with SingleTickerProviderSt
       }
 
       GoogleAdManager().loadInterstitialAd(onAdLoadError: () {
-        // In case of failed to load google ads, load facebook ads instead
-        FacebookAdManager().loadInterstitialAd();
+        // In case of failed to load google ads, load applovin ads instead
+        // AppLovinAdManager().consentFlow();
+        AppLovinAdManager().loadInterstitialAd();
       });
     });
   }
@@ -80,7 +81,7 @@ class _RemoteScreenState extends State<RemoteScreen> with SingleTickerProviderSt
         bool isGoogleAdLoaded = GoogleAdManager().isAdLoaded();
         final shouldPop = isGoogleAdLoaded
             ? await GoogleAdManager().showInterstitialAd()
-            : await FacebookAdManager().showInterstitialAd();
+            : await AppLovinAdManager().showInterstitialAd();
         if (mounted && shouldPop == true) {
           SystemNavigator.pop();
         }

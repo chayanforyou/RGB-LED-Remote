@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:rgbremote/ads/facebook_ad_manager.dart';
+import 'package:rgbremote/ads/applovin_ad_manager.dart';
 import 'package:rgbremote/utils/consent_manager.dart';
 
 class BannerAdWidget extends StatefulWidget {
@@ -13,23 +13,15 @@ class BannerAdWidget extends StatefulWidget {
 class _BannerAdWidgetState extends State<BannerAdWidget> {
   final _consentManager = ConsentManager();
   BannerAd? _googleBannerAd;
-  Widget? _facebookBannerAd;
+  Widget? _applovinBannerAd;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      // child: SizedBox(
-      //   width: _bannerAd?.size.width.toDouble() ?? double.infinity,
-      //   height: _bannerAd?.size.height.toDouble() ?? 50,
-      //   child: _bannerAd == null ? SizedBox() : AdWidget(ad: _bannerAd!),
-      // ),
-      child: _facebookBannerAd != null
-          ? _facebookBannerAd!
-          : SizedBox(
-              width: _googleBannerAd?.size.width.toDouble() ?? double.infinity,
-              height: _googleBannerAd?.size.height.toDouble() ?? 50,
-              child: _googleBannerAd == null ? SizedBox() : AdWidget(ad: _googleBannerAd!),
-            ),
+      child: SizedBox(
+        height: 50,
+        child: _applovinBannerAd ?? (_googleBannerAd != null ? AdWidget(ad: _googleBannerAd!) : SizedBox.shrink()),
+      ),
     );
   }
 
@@ -71,7 +63,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
           ad.dispose();
           // In case of failed to load google ads, load facebook ads instead
           setState(() {
-            _facebookBannerAd = FacebookAdManager().loadBannerAd();
+            final size = Size(adSize.width.toDouble(), adSize.height.toDouble());
+            _applovinBannerAd = AppLovinAdManager().loadBannerAd(size);
           });
         },
       ),

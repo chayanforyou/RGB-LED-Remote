@@ -42,7 +42,7 @@ dependencies:
   package_info_plus: ^8.3.0
   url_launcher: ^6.3.1
   google_mobile_ads: ^5.3.1
-  easy_audience_network: ^0.0.7
+  applovin_max: ^4.3.0
 
 dev_dependencies:
   flutter_test:
