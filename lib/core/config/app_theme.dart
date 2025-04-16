@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rgbremote/config/app_color.dart';
+import 'app_color.dart';
 
 class AppTheme {
   AppTheme._();
@@ -16,6 +16,15 @@ class AppTheme {
       backgroundColor: AppColors.kPrimaryColor,
       iconTheme: IconThemeData(
         color: AppColors.kWhiteColor,
+      ),
+    ),
+    dialogTheme: const DialogTheme(
+      backgroundColor: AppColors.kPrimaryColor,
+      surfaceTintColor:AppColors.kPrimaryColor,
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.kWhiteColor.withAlpha(200),
       ),
     ),
   );

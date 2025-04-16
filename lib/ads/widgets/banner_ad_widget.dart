@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:rgbremote/ads/applovin_ad_manager.dart';
-import 'package:rgbremote/utils/consent_manager.dart';
+import 'package:rgbremote/core/utils/consent_manager.dart';
+
+import '../../core/constants/ad_unit_ids.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key});
@@ -14,21 +16,25 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   final _consentManager = ConsentManager();
   BannerAd? _googleBannerAd;
   Widget? _applovinBannerAd;
+  bool _adLoaded = false;
+
+  Widget get _adWidget {
+    if (_applovinBannerAd != null) return _applovinBannerAd!;
+    if (_googleBannerAd != null) return AdWidget(ad: _googleBannerAd!);
+    return const SizedBox.shrink();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SizedBox(
-        height: 50,
-        child: _applovinBannerAd ?? (_googleBannerAd != null ? AdWidget(ad: _googleBannerAd!) : SizedBox.shrink()),
-      ),
+      child: SizedBox(height: 50, child: _adWidget),
     );
   }
 
   @override
   void initState() {
     super.initState();
-    _loadAd();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadAd());
   }
 
   @override
@@ -39,15 +45,17 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   /// Loads a banner ad.
   void _loadAd() async {
-    var canRequestAds = await _consentManager.canRequestAds();
-    if (!canRequestAds) return;
+    if (_adLoaded) return;
 
-    if (!mounted) return;
+    final canRequestAds = await _consentManager.canRequestAds();
+    if (!canRequestAds || !mounted) return;
+
+    _adLoaded = true;
 
     final adSize = await _getAdSize(context);
     final bannerAd = BannerAd(
       size: adSize,
-      adUnitId: "ca-app-pub-3224119074707344/1274582513",
+      adUnitId: AdUnitIds.googleBanner,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
@@ -61,11 +69,13 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
           ad.dispose();
-          // In case of failed to load google ads, load facebook ads instead
-          setState(() {
+          // In case of failed to load google ads, load applovin ads instead
+          if (mounted && _applovinBannerAd == null) {
             final size = Size(adSize.width.toDouble(), adSize.height.toDouble());
-            _applovinBannerAd = AppLovinAdManager().loadBannerAd(size);
-          });
+            setState(() {
+              _applovinBannerAd = AppLovinAdManager().loadBannerAd(size);
+            });
+          }
         },
       ),
     );
@@ -74,8 +84,9 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   }
 
   Future<AdSize> _getAdSize(BuildContext context) async {
-    final AdSize? adaptiveSize =
-        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(MediaQuery.sizeOf(context).width.truncate());
+    final AdSize? adaptiveSize = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+      MediaQuery.sizeOf(context).width.truncate(),
+    );
 
     if (adaptiveSize == null) {
       return AdSize.banner;

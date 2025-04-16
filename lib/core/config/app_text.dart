@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rgbremote/config/app_color.dart';
+
+import 'app_color.dart';
 
 class AppTextStyle {
   AppTextStyle._();
@@ -31,6 +32,12 @@ class AppTextStyle {
   static const kWS14W400 = TextStyle(
     fontSize: 14,
     color: AppColors.kWhiteColor,
+    fontWeight: FontWeight.w400,
+  );
+
+  static const kBS13W400 = TextStyle(
+    fontSize: 13,
+    color: AppColors.kBlackColor,
     fontWeight: FontWeight.w400,
   );
 }

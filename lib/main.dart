@@ -3,17 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/dropdown_alert.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:rgbremote/config/app_theme.dart';
-import 'package:rgbremote/services/settings_service.dart';
-import 'package:rgbremote/ads/applovin_ads.dart';
-import 'package:rgbremote/views/remote_screen.dart';
-import 'package:rgbremote/views/settings_screen.dart';
 
-void main() {
+import 'ads/applovin_ads.dart';
+import 'application/navigation/app_router.dart';
+import 'application/services/settings_service.dart';
+import 'core/config/app_theme.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(MobileAds.instance.initialize());
   unawaited(AppLovinAds.instance.initialize());
-  unawaited(SettingsService.initialize());
+  await SettingsService().initialize();
+  
   runApp(const MyApp());
 }
 
@@ -31,10 +32,8 @@ class MyApp extends StatelessWidget {
           DropdownAlert()
         ],
       ),
-      home: RemoteScreen(),
-      routes: {
-        SettingsScreen.routeName: (_) => SettingsScreen(),
-      },
+      initialRoute: Routes.remote,
+      onGenerateRoute: generatedRoutes,
     );
   }
 }

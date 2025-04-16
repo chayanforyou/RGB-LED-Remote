@@ -5,10 +5,10 @@ packages:
     dependency: "direct main"
     description:
       name: applovin_max
-      sha256: b55336c0952b26ea5dba554985a86e277251887a18e7238a99ec085f9445f97f
+      sha256: c1f52747f4f8d36a4476786b1fa05ee1e281ee91f7714a640b2a707345900c46
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.0"
+    version: "4.4.0"
   async:
     dependency: transitive
     description:
@@ -144,6 +144,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  just_the_tooltip:
+    dependency: "direct main"
+    description:
+      name: just_the_tooltip
+      sha256: "7a081133d57285bfb41b331f411006d57b433d7b35772e6155745f6a7a09cb82"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.12"
   leak_tracker:
     dependency: transitive
     description:
@@ -344,6 +352,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
+  page_transition:
+    dependency: "direct main"
+    description:
+      name: page_transition
+      sha256: "9d2a780d7d68b53ae82fbcc43e06a16195e6775e9aae40e55dc0cbb593460f9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1"
   path:
     dependency: transitive
     description:
@@ -396,10 +412,10 @@ packages:
     dependency: "direct main"
     description:
       name: shared_preferences
-      sha256: "846849e3e9b68f3ef4b60c60cf4b3e02e9321bc7f4d8c4692cf87ffa82fc8a3a"
+      sha256: "6e8bf70b7fef813df4e9a36f658ac46d107db4b4cfe1048b477d4e453a8159f5"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.2"
+    version: "2.5.3"
   shared_preferences_android:
     dependency: transitive
     description:
@@ -609,10 +625,10 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter_android
-      sha256: "631093a7fbd93e9690ac61d8c8f3e857efbc189fc33f712b9ad6c01a623517ef"
+      sha256: e09150b28a07933839adef0e4a088bb43e8c8d9e6b93025b01882d4067a58ab0
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.3"
+    version: "4.3.4"
   webview_flutter_platform_interface:
     dependency: transitive
     description:

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:rgbremote/config/app_text.dart';
-import 'package:rgbremote/widgets/hyper_link.dart';
+
+import '../../../core/config/app_text.dart';
+import '../../widgets/hyper_link.dart';
+
 
 class AboutApp extends StatefulWidget {
   const AboutApp({super.key});
